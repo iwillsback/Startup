@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerar Roteiro - InclusiTour</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>InclusiTour</h1>
+        <p>Roteiros de viagem personalizados para pessoas com acessibilidade.</p>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="sobre.html">Sobre Nós</a></li>
+            <li><a href="gerar_roteiro.html">Gerar Roteiro</a></li>
+            <li><a href="testemunhos.html">Testemunhos</a></li>
+            <li><a href="contato.html">Contato</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <section id="gerar-roteiro">
+            <h2>Gere Seu Roteiro</h2>
+            <form id="preferences-form" onsubmit="return false;">
+                <label for="disability-type">Tipo de Deficiência:</label>
+                <select id="disability-type" required>
+                    <option value="">Selecione...</option>
+                    <option value="fisica">Física</option>
+                </select>
+
+                <label for="destination">Destino Desejado:</label>
+                <input type="text" id="destination" placeholder="Ex: Rio de Janeiro" required>
+
+                <label for="travel-dates">Datas da Viagem:</label>
+                <input type="text" id="travel-dates" placeholder="Ex: 01/01/2025 a 07/01/2025" required>
+
+                <button type="submit" onclick="gerarRoteiro()">Gerar Roteiro</button>
+                <button type="submit" onclick="salvarRoteiro()">Salvar Roteiro</button>
+            </form>
+
+            <div id="itinerary" class="hidden">
+                <h3>Seu Roteiro:</h3>
+                <pre id="itinerary-content"></pre>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 InclusiTour. Todos os direitos reservados.</p>
+    </footer>
+
+    <script>
+        async function gerarRoteiro() {
+            const tipoDeficiencia = document.getElementById('disability-type').value;
+            const destino = document.getElementById('destination').value;
+            const datas = document.getElementById('travel-dates').value;
+
+            const response = await fetch('/gerar_roteiro', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    tipo_deficiencia: tipoDeficiencia,
+                    destino: destino,
+                    datas: datas
+                })
+            });
+
+            const data = await response.json();
+            document.getElementById('itinerary-content').innerText = data.roteiro;
+            document.getElementById('itinerary').classList.remove('hidden');
+        }
+        async function salvarRoteiro(tipoDeficiencia, destino, datas, conteudo) {
+        const response = await fetch('/salvar_roteiro', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                tipo_deficiencia: tipoDeficiencia,
+                destino: destino,
+                datas: datas,
+                conteudo: conteudo
+            })
+        });
+
+        if (response.ok) {
+            const result = await response.json();
+            alert(result.message);
+        } else {
+            alert('Erro ao salvar o roteiro.');
+        }
+    }
+        
+    </script>
+</body>
+</html>
